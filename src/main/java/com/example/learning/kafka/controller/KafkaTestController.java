@@ -1,5 +1,6 @@
 package com.example.learning.kafka.controller;
 
+import com.example.learning.kafka.dto.MessageDTO;
 import com.example.learning.kafka.service.KafkaTestService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +18,8 @@ public class KafkaTestController {
     private final KafkaTestService kafkaTestService;
 
     @PostMapping("/send-msg")
-    public ResponseEntity<String> sendMsg(@RequestBody String message) throws ExecutionException, InterruptedException {
-        kafkaTestService.sendMsg(message);
+    public ResponseEntity<String> sendMsg(@RequestBody MessageDTO dto) throws ExecutionException, InterruptedException {
+        kafkaTestService.sendMsg(dto);
         return ResponseEntity.ok("OK");
     }
 }

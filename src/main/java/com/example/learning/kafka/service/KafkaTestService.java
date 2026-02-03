@@ -1,6 +1,7 @@
 package com.example.learning.kafka.service;
 
 import com.example.learning.kafka.dto.KafkaEvent;
+import com.example.learning.kafka.dto.MessageDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -19,10 +20,10 @@ import java.util.concurrent.ExecutionException;
 @Slf4j
 public class KafkaTestService {
     private final KafkaTemplate<String, Object> kafkaTemplate;
-    public void sendMsg(String message) throws ExecutionException, InterruptedException {
+    public void sendMsg(MessageDTO messageDTO) throws ExecutionException, InterruptedException {
         Message<KafkaEvent<String>> msg = MessageBuilder
-                .withPayload(KafkaEvent.<String>builder().payload(message).build())
-                .setHeader(KafkaHeaders.TOPIC, "test-topic")
+                .withPayload(KafkaEvent.<String>builder().payload(messageDTO.getMessage()).build())
+                .setHeader(KafkaHeaders.TOPIC, messageDTO.getTopic())
                 .setHeader(KafkaHeaders.KEY, UUID.randomUUID().toString())
                 .build();
         kafkaTemplate.send(msg).whenComplete((r, ex) -> {

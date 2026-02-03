@@ -4,9 +4,11 @@ import com.example.learning.kafka.dto.KafkaEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.annotation.RetryableTopic;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
+import org.springframework.retry.annotation.Backoff;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -25,6 +27,39 @@ public class KListener {
         log.info("Received message: {}, key: {}, partitionId: {}, offset: {}, groupId: {} on thread {}",
                 data.getPayload(), key, partitionId, offset, groupId, thread.getName());
         acknowledgment.acknowledge();
+    }
+
+    @KafkaListener(topics = "test-fail-topic")
+    public void handleFailTopic(
+            KafkaEvent<?> data,
+            @Header(KafkaHeaders.RECEIVED_KEY) String key,
+            @Header(KafkaHeaders.RECEIVED_PARTITION) int partitionId,
+            @Header(KafkaHeaders.OFFSET) long offset,
+            @Header(KafkaHeaders.GROUP_ID) String groupId,
+            Acknowledgment acknowledgment
+    ) {
+        throw new RuntimeException("Simulated processing failure for testing purposes.");
+    }
+
+    @RetryableTopic(
+            attempts = "4",
+            backoff = @Backoff(
+                    delay = 1000
+            ),
+            autoCreateTopics = "true",
+            retryTopicSuffix = "-retry",
+            dltTopicSuffix = ".DLQ"
+    )
+    @KafkaListener(topics = "test-inplace-fail-topic")
+    public void handleInPlaceFailTopic(
+            KafkaEvent<?> data,
+            @Header(KafkaHeaders.RECEIVED_KEY) String key,
+            @Header(KafkaHeaders.RECEIVED_PARTITION) int partitionId,
+            @Header(KafkaHeaders.OFFSET) long offset,
+            @Header(KafkaHeaders.GROUP_ID) String groupId,
+            Acknowledgment acknowledgment
+    ) {
+        throw new RuntimeException("Simulated processing failure for testing purposes.");
     }
 
 //    @KafkaListener(topics = "test-topic", groupId = "group_name_2")

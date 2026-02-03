@@ -4,6 +4,7 @@ services:
     shm_size: 128mb
     volumes:
       - db_data:/var/lib/postgresql
+      - C:/Users/nh0kc/Programming/data-cleaner/social_media_post_fake_data/data:/tmp/post_data:ro
     ports:
       - "5432:5432"
     environment:
@@ -114,7 +115,7 @@ services:
     image: provectuslabs/kafka-ui
     ports:
       - "8081:8080"
-    restart: always
+    restart: no
     environment:
       KAFKA_CLUSTERS_0_NAME: "kraft-cluster"
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka-1:9094,kafka-2:9094,kafka-3:9094
