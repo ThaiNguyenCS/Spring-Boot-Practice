@@ -7,13 +7,13 @@ import jakarta.persistence.Version;
 import lombok.Data;
 
 @Entity
-@Table(name = "products")
+@Table(name="vouchers")
 @Data
-public class Product
-{
+public class Voucher {
     @Id
     Long id;
-    Integer stock;
-    String name;
-    Double price;
+    Integer maxQuantity;
+    Integer claimCount;
+    @Version
+    Long version;
 }

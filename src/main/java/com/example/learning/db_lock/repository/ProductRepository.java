@@ -15,7 +15,7 @@ import java.util.Optional;
 public interface ProductRepository extends JpaRepository<Product, Long> {
     Optional<ProductDTO> findProductById (Long id);
 
-//    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT p from Product p where p.id in :ids")
     List<Product> findProductByIdsForOrdering(List<Long> ids);
 
