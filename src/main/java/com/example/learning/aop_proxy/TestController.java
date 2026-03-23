@@ -16,4 +16,10 @@ public class TestController {
         testService.test();
         return ResponseEntity.ok(id);
     }
+
+    @GetMapping("/hello")
+    public ResponseEntity<String> helloWorld () throws InterruptedException {
+        Thread.sleep(300); // Giả lập một tác vụ tốn thời gian để tránh network overhead do nginx
+        return ResponseEntity.ok("Hello World");
+    }
 }

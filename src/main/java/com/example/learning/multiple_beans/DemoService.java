@@ -9,14 +9,14 @@ import org.springframework.web.client.RestTemplate;
 @Service
 public class DemoService {
     private final RestTemplate authRestTemplate;
-    @Qualifier("paymentRestTemplate")
-    private final RestTemplate restTemplate;
+    private final RestTemplate paymentRestTemplate;
 
     public void callAuthService() {
         authRestTemplate.getForObject("http://example.com/auth", String.class);
     }
 
     public void callPaymentService() {
-        restTemplate.getForObject("http://example.com/payment", String.class);
+        paymentRestTemplate.getForObject("https://jsonplaceholder.typicode.com/todos/1", String.class);
+        paymentRestTemplate.getForObject("https://jsonplaceholder.typicode.com/posts", String.class);
     }
 }

@@ -1,0 +1,53 @@
+spring:
+  application:
+    name: learning
+
+  datasource:
+    master:
+      jdbc-url: jdbc:postgresql://db-master:5432/postgres
+      username: admin
+      password: admin
+      driver-class-name: org.postgresql.Driver
+      hikari:
+        maximum-pool-size: 50
+        minimum-idle: 10
+
+    slave:
+      jdbc-url: jdbc:postgresql://db-slave:5432/postgres
+      username: admin
+      password: admin
+      driver-class-name: org.postgresql.Driver
+      hikari:
+        maximum-pool-size: 50
+        minimum-idle: 10
+
+  jpa:
+     show-sql: true
+     hibernate:
+       ddl-auto: create-only
+
+  flyway:
+    enabled: true
+
+  aop:
+    proxy-target-class: false
+
+  data:
+    web:
+      pageable:
+        max-page-size: 10000
+
+  kafka:
+    bootstrap-servers: kafka-1:9094,kafka-2:9094,kafka-3:9094
+    consumer:
+      group-id: learning-group
+
+logging:
+  file:
+    name: logs/learning.log
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"

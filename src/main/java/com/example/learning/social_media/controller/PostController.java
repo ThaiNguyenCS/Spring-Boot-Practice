@@ -20,22 +20,32 @@ import java.util.List;
 public class PostController {
     private final PostService postService;
 
-    @GetMapping("/{userId}")
+    @PostMapping("")
+    public ResponseEntity<Posts> createPost(@RequestBody Posts post) {
+        return ResponseEntity.ok(postService.createPost(post));
+    }
+
+    @GetMapping("/{postId}")
+    public ResponseEntity<Posts> getPostsById(@PathVariable Long postId) {
+        return ResponseEntity.ok(postService.findByPostId(postId));
+    }
+
+    @GetMapping("/by-users/{userId}")
     public ResponseEntity<List<Posts>> getPostsByUserId(@PathVariable Integer userId) {
         return ResponseEntity.ok(postService.findByUserId(userId));
     }
 
-    @GetMapping("/{userId}/lazy-load")
+    @GetMapping("/by-users/{userId}/lazy-load")
     public ResponseEntity<List<Posts>> getPostsByUserIdLazyLoad(@PathVariable Integer userId) {
         return ResponseEntity.ok(postService.findByUserIdLazyLoad(userId));
     }
 
-    @GetMapping("/{userId}/detail")
+    @GetMapping("/by-users/{userId}/detail")
     public ResponseEntity<List<PostDetail>> getPostDetailsByUserId(@PathVariable Integer userId) {
         return ResponseEntity.ok(postService.findPostDetailsByUserId(userId));
     }
 
-    @GetMapping("/{userId}/detail2")
+    @GetMapping("/by-users/{userId}/detail2")
     public ResponseEntity<List<PostDetail>> getPostDetailsByUserIdUsingInterfaceProjection(@PathVariable Integer userId) {
         return ResponseEntity.ok(postService.findPostDetailsByUserIdUsingInterfaceProjection(userId));
     }

@@ -15,6 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 public class Posts {
     @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE) // PostgreSQL sẽ dùng SERIAL hoặc IDENTITY
     Long id;
     Integer userId;
     String content;

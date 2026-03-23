@@ -27,6 +27,10 @@ public class PostService {
     private final MediaRepository mediaRepository;
     private final PartitionMediaRepository partitionMediaRepository;
 
+    public Posts findByPostId(Long postId) {
+        return postsRepository.findById(postId).orElse(null);
+    }
+
     public List<Posts> findByUserId(Integer userId) {
         return postsRepository.findAllByUserId(userId);
     }
@@ -74,6 +78,7 @@ public class PostService {
     }
 
     public KeySetPage<Posts, Long> findAllPostsAdvancePaging(Long lastId, Pageable pageable) {
+        // keyset pagination
         Pageable fetchMore = PageRequest.of(
                 pageable.getPageNumber(),
                 pageable.getPageSize() + 1,
@@ -81,5 +86,9 @@ public class PostService {
         );
         List<Posts> posts = postsRepository.findNext(lastId, fetchMore);
         return KeySetPage.of(posts, pageable.getPageSize(), Posts::getId);
+    }
+
+    public Posts createPost(Posts post) {
+        return postsRepository.save(post);
     }
 }

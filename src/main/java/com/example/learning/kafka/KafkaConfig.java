@@ -1,5 +1,6 @@
 package com.example.learning.kafka;
 
+import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -8,6 +9,7 @@ import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.compress.Compression;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.springframework.boot.kafka.autoconfigure.KafkaProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
@@ -17,8 +19,8 @@ import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.listener.DeadLetterPublishingRecoverer;
 import org.springframework.kafka.listener.DefaultErrorHandler;
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
-import org.springframework.kafka.support.serializer.JsonDeserializer;
-import org.springframework.kafka.support.serializer.JsonSerializer;
+import org.springframework.kafka.support.serializer.JacksonJsonDeserializer;
+import org.springframework.kafka.support.serializer.JacksonJsonSerializer;
 import org.springframework.util.backoff.FixedBackOff;
 
 import java.util.Collections;
@@ -27,7 +29,10 @@ import java.util.Map;
 
 @EnableKafka
 @Configuration
+@RequiredArgsConstructor
 public class KafkaConfig {
+    private final KafkaProperties kafkaProperties;
+
     @Bean
     ConcurrentKafkaListenerContainerFactory<String, String> kafkaListenerContainerFactory(ConsumerFactory<String, String> consumerFactory, DefaultErrorHandler errorHandler) {
         ConcurrentKafkaListenerContainerFactory<String, String> factory =
@@ -41,7 +46,7 @@ public class KafkaConfig {
 
     private Map<String, Object> consumerProps() {
         Map<String, Object> props = new HashMap<>();
-        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:19092");
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.getBootstrapServers());
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         // option 1: no error handling deserializer
 //        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
@@ -50,9 +55,9 @@ public class KafkaConfig {
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class); // wrapper for key deserializer
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class); // wrapper for value deserializer
         props.put(ErrorHandlingDeserializer.KEY_DESERIALIZER_CLASS, StringDeserializer.class); // actual key deserializer
-        props.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, JsonDeserializer.class); // actual value deserializer
+        props.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, JacksonJsonDeserializer.class); // actual value deserializer
 
-        props.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
+        props.put(JacksonJsonDeserializer.TRUSTED_PACKAGES, "*");
 
         props.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, 300000); // the time between polls
         props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 10); // 1 poll fetches max N records
@@ -62,15 +67,15 @@ public class KafkaConfig {
     }
 
     @Bean
-    public ConsumerFactory<String, String> consumerFactory() {
+    public ConsumerFactory<String, String> consumerFactory(KafkaProperties kafkaProperties) {
         return new DefaultKafkaConsumerFactory<>(consumerProps());
     }
 
     private Map<String, Object> producerProps() {
         Map<String, Object> props = new HashMap<>();
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:19092");
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.getBootstrapServers());
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JacksonJsonSerializer.class);
         props.put(ProducerConfig.LINGER_MS_CONFIG, 10);
         props.put(ProducerConfig.BATCH_SIZE_CONFIG, 65536);
         props.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, "lz4");
@@ -90,7 +95,7 @@ public class KafkaConfig {
     @Bean
     public KafkaAdmin kafkaAdmin() {
         Map<String, Object> configs = new HashMap<>();
-        configs.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:19092");
+        configs.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.getBootstrapServers());
         return new KafkaAdmin(configs);
     }
 
