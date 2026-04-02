@@ -33,3 +33,5 @@ build/
 .vscode/
 
 /logs
+
+/glowroot-0.14.0-dist/**

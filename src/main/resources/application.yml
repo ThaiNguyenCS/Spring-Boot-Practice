@@ -1,46 +1,25 @@
 spring:
   application:
-    name: learning
+    name: dbms-assignment
 
   datasource:
-    master:
-      jdbc-url: jdbc:postgresql://db-master:5432/postgres
-      username: admin
-      password: admin
-      driver-class-name: org.postgresql.Driver
-      hikari:
-        maximum-pool-size: 50
-        minimum-idle: 10
-
-    slave:
-      jdbc-url: jdbc:postgresql://db-slave:5432/postgres
-      username: admin
-      password: admin
-      driver-class-name: org.postgresql.Driver
-      hikari:
-        maximum-pool-size: 50
-        minimum-idle: 10
+    url: jdbc:postgresql://localhost:5432/main_db
+    username: admin
+    password: admin
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 50
+      minimum-idle: 10
 
   jpa:
      show-sql: true
      hibernate:
-       ddl-auto: create-only
-
-  flyway:
-    enabled: true
-
-  aop:
-    proxy-target-class: false
+       ddl-auto: validate
 
   data:
     web:
       pageable:
         max-page-size: 10000
-
-  kafka:
-    bootstrap-servers: kafka-1:9094,kafka-2:9094,kafka-3:9094
-    consumer:
-      group-id: learning-group
 
 logging:
   file:
@@ -51,3 +30,9 @@ management:
     web:
       exposure:
         include: "*"
+
+app:
+  jwt:
+    # 256-bit Base64-encoded secret
+    secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+    expiration-ms: 86400000 # 24 hours
